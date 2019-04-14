@@ -321,10 +321,10 @@ summary(chart_data)
 # plotting
 
 #table() uses the cross-classifying factors to build a contingency table of the counts at each combination of factor levels.
-table(chart_data$Postcode)
+table(chart_data$Crime.type)
 
-barplot(table(chart_data$Postcode), col = rainbow(20), main="Crime and postcode",
-        xlab="Poscodes",
-        ylab="Total number of Anti-socialbehaviour", space = 10)
+barplot(table(chart_data$Crime.type), main="Crime rates and types details",
+        xlab="Crimes",
+        ylab="Crime rates")
 
 
