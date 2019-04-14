@@ -298,13 +298,15 @@ nrow(random_crime_sample)
 
 # Task G
 
-random_crime_sample <- updated_random_sample
+updated_random_sample <- random_crime_sample
 
 #sorting postcode starting by BT1 and crime type
 library(stringr)
 chart_data <- random_crime_sample %>%
   select(Crime.type, Postcode) %>%   
   filter(str_detect(Postcode, "BT1"))
+
+updated_random_sample
 
 chart_data
 
