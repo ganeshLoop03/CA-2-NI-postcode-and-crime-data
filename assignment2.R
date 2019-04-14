@@ -2,20 +2,23 @@
 
 
 # Task A
-# Displaying structure and first 10 rows from dataframe 
+# Displaying structure, total number of rows and first 10 rows from dataframe 
 
 
-# Reading csv file and converting all blanks to NA as blank cells are available in the data
+# Reading csv file and converting all blanks to NA 
 NiPostCode <- read.csv("NIPostcodes.csv",na.strings="",header=FALSE)
 
 
+NiPostCode
 # to show structure of data set
 str(NiPostCode)
 
-# to show total number of rows in each column 
-summary(NiPostCode)
 
-# to display first 1o rows of the data
+# to show total number of rows in dataset
+nrow(NiPostCode)
+
+
+# to display first 10 rows of the data
 NiPostCode[1:10,]
 
 
@@ -41,15 +44,16 @@ names(NiPostCode)[15] <-"Primary Key"
 
 
 NiPostCode[1:10,]
-NiPostCode
+str(NiPostCode)
 
+NiPostcodes
 
 # Task C : Removing missing entities
 
 
-# delete columns with more than 50% missings values
+# delete columns with more than 50% missing values
 NiPostcodes <- NiPostCode[, -which(colMeans(is.na(NiPostCode)) > 0.5)]
-NiPostcodes
+(NiPostcodes)
 
 
 
@@ -69,7 +73,7 @@ mean(is.na(NiPostCode))
 
 
 # output of mean of NA's in Individual columns 
-na_mean <-sapply(NiPostCode, function(y) mean(length(which(is.na(y)))))
+na_mean <-sapply(NiPostCode, function(y) sum(mean(which(is.na(y)))))
 na_mean <- data.frame(na_mean)
 na_mean
 
@@ -80,6 +84,7 @@ na_mean
 # Modifing the County attribute to be a categorising factor
 NiPostcodes$County <- as.factor(NiPostcodes$County)
 str(NiPostcodes)
+NiPostcodes
 
 # Task F
 
@@ -92,12 +97,15 @@ NiPostcodes[1:10,]
 # Task G
 
 
-#Creating new dataset and storing only information that has town name Limavady
+#Creating new dataset and storing Locality, Townland and Town information that has town name Limavady
 library(dplyr)
 
 Limavady_data <- subset (NiPostCode, Town == "LIMAVADY", 
                           select=c(Locality, Townland, Town))
-Limavady_data
+
+# writing data to csv file 
+str(Limavady_data)
+
 
 write.csv(Limavady_data, 
           file = "Limavady.csv")
@@ -135,7 +143,7 @@ AllNIcrime <- do.call("rbind", lapply(file_list,
                   read.csv(paste(folder, x, sep=''), 
                    stringsAsFactors = FALSE)))
 
-head(AllNIcrime)
+str(AllNIcrime)
 
 
 #reading total number of rows and head of the ALLNIcrimeData
@@ -172,7 +180,7 @@ df$Crime.type <- as.factor(df$Crime.type)
 str(df)
 
 
-
+df
 # Task D: 
 
 
@@ -188,7 +196,7 @@ df[4] <- lapply(df[4], gsub, pattern = "No Location" , replacement = "", fixed =
 # Marking empty rows as NA  
 library(dplyr)
 df <- df %>% mutate_all(na_if, " ")
-df
+(df)
 
 
 head(df,15)
@@ -246,7 +254,6 @@ str(NiPostCode1)
 # to lower case in order to match primary atribute "Location"
 
 
-
 locations$Location <- tolower(locations$Location)
 locations
 
@@ -254,41 +261,36 @@ NiPostCode1$Location <- tolower(NiPostCode1$Location)
 NiPostCode1
 
 
-##Removing Whitespace From a Whole Data Frame in R
-locations1 <- as.data.frame(apply(locations,2,function(x)gsub('\\s+', '',x)))
-NiPostCode11 <- as.data.frame(apply(NiPostCode1,2,function(x)gsub('\\s+', '',x)))
-
 
 # returns string w/o leading or trailing whitespace
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
-locations1$Location <- trim(locations1$Location)
+locations$Location <- trim(locations$Location)
 
 NiPostCode1$Location <- trim(NiPostCode1$Location)
 
 
-locations1
-NiPostCode11
-
 
 #Delete Duplicates and Merging to find suitable postcode value from the postcode dataset
-merged1 <- merge(x = locations1, y = NiPostCode11[!duplicated(NiPostCode11$Location),], by = "Location", all.x = TRUE)
+find_a_postcode  <- merge(x = locations, y = NiPostCode1[!duplicated(NiPostCode1$Location),], by = "Location", all.x = TRUE)
 
-merged1
+find_a_postcode 
 
 
 # removing NA values from random_crime_sample data
-updated_random_sample <- na.omit(merged1)
+random_crime_sample <- na.omit(find_a_postcode)
+
+random_crime_sample
 
 
 # storing the postcode output on _updated_random_crime_sample
-write.csv(updated_random_sample, "updated_random_sample", row.names=FALSE)
+write.csv(random_crime_sample, "random_crime_sample.csv", row.names=FALSE)
 
 #structure of modified crime data sample
-str(updated_random_sample)
+str(random_crime_sample)
 
 # total number of rows 
-nrow(updated_random_sample)
+nrow(random_crime_sample)
 
 
 ###################################################
@@ -296,14 +298,17 @@ nrow(updated_random_sample)
 
 # Task G
 
+random_crime_sample <- updated_random_sample
 
 #sorting postcode starting by BT1 and crime type
 library(stringr)
-chart_data <- updated_random_sample %>%
+chart_data <- random_crime_sample %>%
   select(Crime.type, Postcode) %>%   
   filter(str_detect(Postcode, "BT1"))
 
 chart_data
+
+write.csv(updated_random_sample, "chart_data.csv", row.names=FALSE)
 
 # Summary statistics 
 
